@@ -22,9 +22,8 @@ module.exports = function (source, inputSourceMap) {
 
     this.cacheable && this.cacheable();
 
-	config = merge(defaultConfig, {});
-    config = merge(this.options[query.config || "closureLoader"], config);
-	config = merge(query, config);
+    config = merge(this.options[query.config || "closureLoader"] || {}, defaultConfig || {});
+	config = merge(query || {}, config);
 
     mapBuilder(config.paths, config.watch).then(function(provideMap) {
         var provideRegExp = /goog\.provide *?\((['"])(.*?)\1\);?/,
