@@ -1,6 +1,6 @@
 {
   "name": "configurator-closure-loader",
-  "version": "0.1.17",
+  "version": "0.1.19",
   "description": "Webpack loader for google closure library dependencies",
   "main": "index.js",
   "scripts": {
