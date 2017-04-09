@@ -1,5 +1,5 @@
 var loaderUtils = require("loader-utils"),
-	merge = require('deep-extend'),
+    merge = require('deep-extend'),
     mapBuilder = require('./dependencyMapBuilder'),
     SourceNode = require("source-map").SourceNode,
     SourceMapConsumer = require("source-map").SourceMapConsumer,
@@ -38,8 +38,8 @@ module.exports = function (source, inputSourceMap) {
         }
 
         while (matches = requireRegExp.exec(source)) {
-            globalVars.push(matches[2]);
-            source = replaceRequire(source, matches[2], matches[0], provideMap, exportedVars);
+			globalVars.push(matches[2]);
+			source = replaceRequire(source, matches[2], matches[0], provideMap, exportedVars, query.ignoreModules);
         }
 
         globalVars = globalVars
@@ -91,6 +91,30 @@ module.exports = function (source, inputSourceMap) {
         }
     }
 
+	function shouldIgnore(ignoreModules, key) {
+		if (!ignoreModules) {
+			return false;
+		} else if (typeof ignoreModules == 'function') {
+			return ignoreModules(key);
+		} else if (typeof ignoreModules == 'string') {
+			return ignoreModules == key;
+		} else if (ignoreModules.test) {
+			return ignoreModules.test(key);
+		} else if (ignoreModules.length) {
+			for (var i = 0; i < ignoreModules.length; i++) {
+				if (shouldIgnore(ignoreModules[i], key)) {
+					return true;
+				}
+			}
+			return false;
+		} else {
+			console.dir(ignoreModules);
+			console.error('Unknown type for ignoreModules (expected function, string, RegExp, Array or undefined): ', ignoreModules);
+			throw ignoreModules;
+			throw new Error('Unknown type for ignoreModules (expected function, string, RegExp, Array or undefined): ', ignoreModules);
+		}
+	}
+
     /**
      * Replace a given goog.require() with a CommonJS require() call.
      *
@@ -100,7 +124,7 @@ module.exports = function (source, inputSourceMap) {
      * @param {Object} provideMap
      * @returns {string}
      */
-    function replaceRequire(source, key, search, provideMap, exportedVars) {
+    function replaceRequire(source, key, search, provideMap, exportedVars, ignoreModules) {
         var replaceRegex = new RegExp(escapeRegExp(search), 'g');
         var path, requireString;
 
@@ -113,7 +137,9 @@ module.exports = function (source, inputSourceMap) {
 
         // if the required module is a parent of a provided module, use deep-extend so that injected
         // namespaces are not overwritten
-        if (isParent(key, exportedVars)) {
+		if (shouldIgnore(ignoreModules, key)) {
+			return source.replace(replaceRegex, '');
+		} else if (isParent(key, exportedVars)) {
           return source.replace(replaceRegex, key + '=__merge(' + requireString + ', (' + key + ' || {}));');
         } else {
           return source.replace(replaceRegex, key + '=' + requireString + ';');
