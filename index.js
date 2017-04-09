@@ -54,7 +54,7 @@ module.exports = function (source, inputSourceMap) {
         prefix = createPrefix(globalVarTree);
         postfix = createPostfix(exportVarTree, exportedVars, config);
 
-        if(inputSourceMap) {
+        if(inputSourceMap && config.sourceMaps) {
             var currentRequest = loaderUtils.getCurrentRequest(self),
                 node = SourceNode.fromStringWithSourceMap(originalSource, new SourceMapConsumer(inputSourceMap));
 
