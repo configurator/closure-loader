@@ -1,6 +1,6 @@
 {
   "name": "configurator-closure-loader",
-  "version": "0.1.21",
+  "version": "0.1.22",
   "description": "Webpack loader for google closure library dependencies",
   "main": "index.js",
   "scripts": {
@@ -22,9 +22,6 @@
 	"Dor Kleiman <configurator@gmail.com>"
   ],
   "license": "MIT",
-  "peerDependencies": {
-    "webpack": "^2.3.2"
-  },
   "dependencies": {
     "bluebird": "^3.4.1",
     "chokidar": "^1.0.6",
@@ -34,5 +31,8 @@
     "loader-utils": "^0.2.11",
     "lodash": "^4.13.1",
     "source-map": "^0.5.1"
+  },
+  "peerDependencies": {
+    "webpack": "^2.3.3 || ^3.0.0"
   }
 }
